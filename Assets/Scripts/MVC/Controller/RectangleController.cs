@@ -8,7 +8,6 @@ namespace Rectangle.Controller
     {
         private LevelObjectView _view;
         private RectangleModel _rectangle;
-        private FigureInfo _figureInfo;
 
         public RectangleController(LevelObjectView view, RectangleModel rectangle)
         {
