@@ -15,7 +15,6 @@ namespace Rectangle.Core
         {
             _levelModel = new LevelModel();
             _rectanglePrefab = Resources.Load<GameObject>("Rectangle");
-
         }
 
         public void OnUpdate()
@@ -31,7 +30,7 @@ namespace Rectangle.Core
            {
                foreach (var binding in bindings.Value)
                {
-                   Debug.DrawLine(binding.PositionModel.CurPosition, bindings.Key.PositionModel.CurPosition, Color.red);
+                   Debug.DrawLine(binding.PositionModel.CurPosition, bindings.Key.PositionModel.CurPosition, Color.red, Time.deltaTime);
                }
            }
         }
@@ -103,11 +102,14 @@ namespace Rectangle.Core
         }
         public void RemoveRectangleModel(RectangleModel model)
         {
+            RemoveAllBindingModel(model);
             _rectanglesOnMap.Remove(model);
         }
 
         public void CreateBindingModel(RectangleModel firstModel, RectangleModel secondModel)
         {
+            
+            
             if (!_rectanglesBindings.ContainsKey(firstModel))
             {
                 _rectanglesBindings.Add(firstModel, new List<RectangleModel>());
@@ -115,7 +117,7 @@ namespace Rectangle.Core
             _rectanglesBindings[firstModel].Add(secondModel);
         }
         
-        public void RemoveAllBindingModel(RectangleModel firstModel, RectangleModel secondModel)
+        public void RemoveAllBindingModel(RectangleModel firstModel)
         {
             _rectanglesBindings.Remove(firstModel);
         }

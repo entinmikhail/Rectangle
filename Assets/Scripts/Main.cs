@@ -8,9 +8,11 @@ public class Main : MonoBehaviour
     private Camera _camera;
     
     private RaycastHit2D _hit;
-
+    private GameObject _rectangle;
     private bool isFirstClick = true;
     private GameObject _firstGo;
+
+    private bool _isSelected;
     void Start()
     {
         _levelManager = new LevelManager();
@@ -25,19 +27,34 @@ public class Main : MonoBehaviour
         
         if (Input.GetButtonDown("Fire1"))
         {
+            if (_hit)
+            {
+                if(_hit.collider.CompareTag("Rectangle"))
+                {
+                    _rectangle = _hit.transform.gameObject;
+                    _isSelected = true;
+                }
+            }
+            
             mousePosition.z = 0;
             _levelManager.CreateRectangle(new RectangleModel(mousePosition));
         }
 
         if (Input.GetButton("Fire1"))
         {
-            if (_hit)
+            if (_rectangle != null && _isSelected)
             {
-                if(_hit.collider.CompareTag("Rectangle"))
-                {
-                    mousePosition.z = 0f;
-                    _levelManager.MoveRectangle(_hit.transform.gameObject, mousePosition);
-                }
+                mousePosition.z = 0f;
+                _levelManager.MoveRectangle(_rectangle, mousePosition);   
+            }
+        }
+
+        if (Input.GetButtonUp("Fire1"))
+        {
+            if (_isSelected)
+            {
+                _isSelected = false;
+                _rectangle = null;
             }
         }
         
@@ -61,7 +78,6 @@ public class Main : MonoBehaviour
                     if(_hit.collider.CompareTag("Rectangle"))
                     {
                         _firstGo = _hit.transform.gameObject;
-                        Debug.Log("first");
                         isFirstClick = false;
                     }
                 }
@@ -73,7 +89,6 @@ public class Main : MonoBehaviour
                     if(_hit.collider.CompareTag("Rectangle"))
                     {
                         var go = _hit.transform.gameObject;
-                        Debug.Log("second");
                         _levelManager.CreateBinding(_firstGo, go);
                         isFirstClick = true;
                     }
