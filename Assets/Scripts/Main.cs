@@ -1,10 +1,11 @@
 using Rectangle.Core;
 using Rectangle.Model;
+using Rectangle.View;
 using UnityEngine;
 
 public class Main : MonoBehaviour
 {
-    private LevelManager _levelManager;
+    private LevelController _levelController;
     private Camera _camera;
     
     private RaycastHit2D _hit;
@@ -16,8 +17,8 @@ public class Main : MonoBehaviour
     
     void Start()
     {
-        _levelManager = new LevelManager();
-        _levelManager.OnInit();
+        _levelController = new LevelController();
+        _levelController.OnInit();
     }
     
     void Update()
@@ -25,7 +26,7 @@ public class Main : MonoBehaviour
         var mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         _hit = Physics2D.Raycast(mousePosition, Vector2.zero);
         
-        _levelManager.OnUpdate();
+        _levelController.OnUpdate();
         
         if (Input.GetButtonDown("Fire1"))
         {
@@ -39,7 +40,7 @@ public class Main : MonoBehaviour
             }
             
             mousePosition.z = 0;
-            _levelManager.CreateRectangle(new RectangleModel(mousePosition));
+            _levelController.CreateRectangle(new RectangleModel(mousePosition));
         }
 
         if (Input.GetButton("Fire1"))
@@ -47,7 +48,7 @@ public class Main : MonoBehaviour
             if (_rectangle != null && _isSelected)
             {
                 mousePosition.z = 0f;
-                _levelManager.MoveRectangle(_rectangle, mousePosition);   
+                _levelController.MoveRectangle(_rectangle.GetComponent<LevelObjectView>(), mousePosition);   
             }
         }
 
@@ -67,7 +68,7 @@ public class Main : MonoBehaviour
                 if(_hit.collider.CompareTag("Rectangle"))
                 {
                     isFirstClick = true;
-                    _levelManager.DestroyRectangle(_hit.transform.gameObject);
+                    _levelController.DestroyRectangle(_hit.transform.gameObject.GetComponent<LevelObjectView>());
                 }
             }
         }
@@ -92,7 +93,7 @@ public class Main : MonoBehaviour
                     if(_hit.collider.CompareTag("Rectangle"))
                     {
                         var go = _hit.transform.gameObject;
-                        _levelManager.CreateBinding(_firstGo, go);
+                        _levelController.CreateBinding(_firstGo.GetComponent<LevelObjectView>(), go.GetComponent<LevelObjectView>());
                         isFirstClick = true;
                     }
                 }

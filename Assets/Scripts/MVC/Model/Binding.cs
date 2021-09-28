@@ -1,11 +1,13 @@
-﻿namespace Rectangle.Model
+﻿using Rectangle.Abstraction;
+
+namespace Rectangle.Model
 {
     public struct Binding
     {
-        public RectangleModel FirstModel;
-        public RectangleModel SecondModel;
+        public IRectangle FirstModel;
+        public IRectangle SecondModel;
 
-        public Binding(RectangleModel firstModel, RectangleModel secondModel)
+        public Binding(IRectangle firstModel, IRectangle secondModel)
         {
             FirstModel = firstModel;
             SecondModel = secondModel;
