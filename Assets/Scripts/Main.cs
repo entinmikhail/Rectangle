@@ -13,9 +13,11 @@ public class Main : MonoBehaviour
     private GameObject _firstGo;
 
     private bool _isSelected;
+    
     void Start()
     {
         _levelManager = new LevelManager();
+        _levelManager.OnInit();
     }
     
     void Update()
@@ -64,6 +66,7 @@ public class Main : MonoBehaviour
             {
                 if(_hit.collider.CompareTag("Rectangle"))
                 {
+                    isFirstClick = true;
                     _levelManager.DestroyRectangle(_hit.transform.gameObject);
                 }
             }

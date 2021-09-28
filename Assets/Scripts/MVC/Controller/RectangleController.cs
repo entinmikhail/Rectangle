@@ -23,5 +23,10 @@ namespace Rectangle.Controller
         {
             
         }
+        
+        public void OnDestroy()
+        {
+            
+        }
     }
 }
