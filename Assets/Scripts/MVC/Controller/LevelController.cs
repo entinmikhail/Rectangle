@@ -10,23 +10,24 @@ namespace Rectangle.Core
 {
     public class LevelController : ILevelController
     {
+        public LevelModel LevelModel;
+        
         private IDictionary<ILevelObjectView, IRectangle> _levelObjects = new Dictionary<ILevelObjectView, IRectangle>();
         private IDictionary<Binding, LineRenderer> _bindingsGo = new Dictionary<Binding, LineRenderer>();
-        private LevelModel _levelModel;
         private GameObject _rectanglePrefab;
         private Material _material;
         
         public LevelController()
         {
-            _levelModel = new LevelModel();
+            LevelModel = new LevelModel();
             _rectanglePrefab = Resources.Load<GameObject>("Rectangle");
             _material = Resources.Load<Material>("Default");
         }
 
         public void OnInit()
         {
-            _levelModel.BindingCreated += CreateBindingLine;
-            _levelModel.BindingRemoved += DestroyBindingLine;
+            LevelModel.BindingCreated += CreateBindingLine;
+            LevelModel.BindingRemoved += DestroyBindingLine;
         }
 
         public void OnUpdate()
@@ -34,11 +35,12 @@ namespace Rectangle.Core
             DrawRay();
         }
 
-        public void CreateRectangle(IRectangle model)
+        public void CreateRectangle(Vector3 position)
         {
-            if (_levelModel.IsCollision(model))
+            var model = new RectangleModel(position);
+            if (LevelModel.IsCollision(model))
             {
-                _levelModel.AddModel(model);
+                LevelModel.AddModel(model);
                 var go = Object.Instantiate(_rectanglePrefab, 
                     model.PositionModel.CurPosition, Quaternion.identity);
                 
@@ -57,7 +59,7 @@ namespace Rectangle.Core
             var prevPosition = model.PositionModel.CurPosition;
             model.PositionModel.SetPosition(newPosition);
             
-            if (!_levelModel.IsCollision(model))
+            if (!LevelModel.IsCollision(model))
             {
                 model.PositionModel.SetPosition(prevPosition);
                 return;
@@ -68,7 +70,7 @@ namespace Rectangle.Core
 
         public void DestroyRectangle(ILevelObjectView view)
         {
-            _levelModel.RemoveRectangleModel(_levelObjects[view]);
+            LevelModel.RemoveRectangleModel(_levelObjects[view]);
             _levelObjects.Remove(view);
             
             Object.Destroy(view.Transform.gameObject);
@@ -77,12 +79,12 @@ namespace Rectangle.Core
         public void CreateBinding(ILevelObjectView firstView, ILevelObjectView secondView)
         {
             var binding = new Binding(_levelObjects[firstView], _levelObjects[secondView]);
-            _levelModel.CreateBindingModel(binding);
+            LevelModel.CreateBindingModel(binding);
         }
         
         private void DrawRay()
         {
-           var allBindings = _levelModel.GetRectanglesBindings();
+           var allBindings = LevelModel.GetRectanglesBindings();
 
            foreach (var binding in allBindings)
            {

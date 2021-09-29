@@ -7,14 +7,17 @@ namespace Rectangle.Model
 {
     public class LevelModel
     {
-        public IList<Binding>  GetRectanglesBindings() => _rectanglesBindings;
-
+        public GameMode GameMode => _gameMode;
+        
+        private GameMode _gameMode;
         private List<IRectangle> _rectanglesOnMap = new List<IRectangle>();
         private IList<Binding> _rectanglesBindings = new List<Binding>();
         private Bounds _levelBounds = new Bounds(Vector3.zero, new Vector3(16f, 9f, 0));
         
         public event Action<Binding> BindingRemoved;
         public event Action<Binding> BindingCreated;
+        
+        public IList<Binding>  GetRectanglesBindings() => _rectanglesBindings;
         
         public bool IsCollision(IRectangle model)
         {
@@ -29,6 +32,11 @@ namespace Rectangle.Model
             return true;
         }
 
+        public void SetGameState(GameMode newGameMode)
+        {
+            _gameMode = newGameMode;
+        }
+        
         public void AddModel(IRectangle model)
         {
             _rectanglesOnMap.Add(model);
@@ -67,5 +75,11 @@ namespace Rectangle.Model
                 }
             }
         }
+    }
+
+    public enum GameMode
+    {
+        Default,
+        Binding
     }
 }
