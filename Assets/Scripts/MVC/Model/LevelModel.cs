@@ -9,8 +9,13 @@ namespace Rectangle.Model
     {
         private List<IRectangle> _rectanglesOnMap = new List<IRectangle>();
         private IList<Binding> _rectanglesBindings = new List<Binding>();
-        private Bounds _levelBounds = new Bounds(Vector3.zero, new Vector3(16f, 9f, 0));
-        
+        private Bounds _levelBounds;
+
+        public LevelModel(Bounds levelBounds)
+        {
+            _levelBounds = levelBounds;
+        }
+
         public event Action<Binding> BindingRemoved;
         public event Action<Binding> BindingCreated;
         

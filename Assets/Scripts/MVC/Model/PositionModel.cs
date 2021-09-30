@@ -1,4 +1,5 @@
 ﻿using Rectangle.Abstraction;
+using Rectangle.ScriptableObjects;
 using UnityEngine;
 
 namespace Rectangle.Model
@@ -11,11 +12,10 @@ namespace Rectangle.Model
         private Vector3 _curPosition;
         private Vector3 _size;
         
-        public PositionModel(Vector3 curPosition)
+        public PositionModel(Vector3 curPosition, GameInfo gameInfo)
         {
             _curPosition = curPosition;
-            SpriteRenderer sprite = Resources.Load<GameObject>("Rectangle").GetComponent<SpriteRenderer>();
-            _size = sprite.size;
+            _size = gameInfo.SpriteSize;
             Bounds = new Bounds(_curPosition, _size);
         }
         

@@ -1,6 +1,7 @@
 ﻿using Rectangle.Core;
 using Rectangle.InputManager;
 using Rectangle.Model;
+using Rectangle.ScriptableObjects;
 using Rectangle.View;
 using UnityEngine;
 
@@ -25,12 +26,13 @@ namespace Rectangle.Controller
         private bool _isFirstClick = true;
         private bool _isFirstClickBinding = true;
         private bool _isSelected;
-        private const float _timeDelay = 0.3f;
+        private float _timeDelayForDoubleClick;
         private float _firstClickTime;
         private bool _isMouseLine;
 
-        public PlayerController( LevelController levelController, GameModel gameModel, InputHandler input)
+        public PlayerController( LevelController levelController, GameModel gameModel, InputHandler input, GameInfo gameInfo)
         {
+            _timeDelayForDoubleClick = gameInfo.TimeDelayForDoubleClick;
             _levelController = levelController;
             _gameModel = gameModel;
             _input = input;
@@ -60,7 +62,7 @@ namespace Rectangle.Controller
         
         private void OnButtonDown()
         {
-            if (Time.time - _firstClickTime > _timeDelay) _isFirstClick = true;
+            if (Time.time - _firstClickTime > _timeDelayForDoubleClick) _isFirstClick = true;
 
             if (_gameModel.IsCreateMode)
             {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Rectangle.Abstraction;
+using Rectangle.ScriptableObjects;
 using UnityEngine;
 
 namespace Rectangle.Model
@@ -15,9 +16,9 @@ namespace Rectangle.Model
         public event Action<IRectangle> RemovedRectangle;
         public event Action<IRectangle, IRectangle> BindedRectangle;
         
-        public RectangleModel(Vector3 curPosition)
+        public RectangleModel(Vector3 curPosition, GameInfo gameInfo)
         {
-            PositionModel = new PositionModel(curPosition);
+            PositionModel = new PositionModel(curPosition, gameInfo);
             CreatedRectangle?.Invoke(this);
         }
 
@@ -32,6 +33,7 @@ namespace Rectangle.Model
             
             _rectangles.Add(rectangleModel);
             rectangleModel.CreateBinding(this);
+            
             BindedRectangle?.Invoke(this, rectangleModel);
         }
     }

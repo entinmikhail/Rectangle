@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Rectangle.Abstraction;
 using Rectangle.Model;
+using Rectangle.ScriptableObjects;
 using Rectangle.View;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -11,25 +12,26 @@ namespace Rectangle.Core
     public class LevelController : ILevelController
     {
         private LevelModel _levelModel;
-        
-        private IDictionary<ILevelObjectView, IRectangle> _levelObjects = new Dictionary<ILevelObjectView, IRectangle>();
-        private IDictionary<Binding, LineRenderer> _bindingsGo = new Dictionary<Binding, LineRenderer>();
         private GameObject _rectanglePrefab;
         private Material _material;
         private LineRenderer _lineToMouse;
         private GameObject _lineGo;
-        public LevelController(LevelModel levelModel)
+        private GameInfo _gameInfo;
+
+        private IDictionary<ILevelObjectView, IRectangle> _levelObjects = new Dictionary<ILevelObjectView, IRectangle>();
+        private IDictionary<Binding, LineRenderer> _bindingsGo = new Dictionary<Binding, LineRenderer>();
+   
+        public LevelController(LevelModel levelModel, GameInfo gameInfo)
         {
             _levelModel = levelModel;
-            _rectanglePrefab = Resources.Load<GameObject>("Rectangle");
-            _material = Resources.Load<Material>("Default");
+            _gameInfo = gameInfo;
+            _rectanglePrefab = gameInfo.RectanglePrefab;
+            _material = gameInfo.BindingLineMaterial;
             
             _levelModel.BindingCreated += CreateBindingLine;
             _levelModel.BindingRemoved += DestroyBindingLine;
         }
-
-
-
+        
         public void OnUpdate()
         {
             MoveAllBindingLine();
@@ -37,7 +39,7 @@ namespace Rectangle.Core
 
         public void CreateRectangle(Vector3 position)
         {
-            var model = new RectangleModel(position);
+            var model = new RectangleModel(position, _gameInfo);
             if (_levelModel.IsCollision(model))
             {
                 _levelModel.AddModel(model);
