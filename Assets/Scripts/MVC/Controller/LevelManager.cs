@@ -40,7 +40,7 @@ namespace Rectangle.Controller
             
             if (_levelModel.IsCollision(model))
             {
-                _levelModel.AddModel(model);
+                _levelModel.AddRectangle(model);
                 
                 var go = Object.Instantiate(_rectanglePrefab, 
                     model.PositionModel.CurPosition, Quaternion.identity);
@@ -50,7 +50,7 @@ namespace Rectangle.Controller
 
                 _levelObjects.Add(go.GetComponent<LevelObjectView>(), model);
 
-                model.PositionChanged += _bindingManager.MoveBinding;
+                model.PositionChanged += _bindingManager.MoveBindings;
             }
         }
 
@@ -71,7 +71,7 @@ namespace Rectangle.Controller
 
         public void DestroyRectangle(ILevelObjectView view)
         {
-            _levelObjects[view].PositionChanged -= _bindingManager.MoveBinding;
+            _levelObjects[view].PositionChanged -= _bindingManager.MoveBindings;
             _levelModel.RemoveRectangleModel(_levelObjects[view]);
             _levelObjects.Remove(view);
             

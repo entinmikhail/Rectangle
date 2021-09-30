@@ -11,7 +11,9 @@ namespace Rectangle.Model
         private IList<Binding> _rectanglesBindings = new List<Binding>();
         
         private Bounds _levelBounds;
-        
+
+        public event Action<IRectangle> RectanglRemoved;
+        public event Action<IRectangle> RectanglAdded;
         public event Action<Binding> BindingRemoved;
         public event Action<Binding> BindingCreated;
         
@@ -35,15 +37,17 @@ namespace Rectangle.Model
             return true;
         }
         
-        public void AddModel(IRectangle model)
+        public void AddRectangle(IRectangle model)
         {
             _rectanglesOnMap.Add(model);
+            RectanglAdded?.Invoke(model);
         }
         
         public void RemoveRectangleModel(IRectangle model)
         {
             RemoveAllBindingModel(model);
             _rectanglesOnMap.Remove(model);
+            RectanglRemoved?.Invoke(model);
         }
 
         public void CreateBindingModel(Binding binding)
