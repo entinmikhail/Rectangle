@@ -32,7 +32,7 @@ namespace Rectangle.Core
 
         public void OnUpdate()
         {
-            DrawRay();
+            MoveAllBindingLine();
         }
 
         public void CreateRectangle(Vector3 position)
@@ -78,11 +78,13 @@ namespace Rectangle.Core
 
         public void CreateBinding(ILevelObjectView firstView, ILevelObjectView secondView)
         {
+            if (firstView == secondView) return;
+
             var binding = new Binding(_levelObjects[firstView], _levelObjects[secondView]);
             LevelModel.CreateBindingModel(binding);
         }
         
-        private void DrawRay()
+        private void MoveAllBindingLine()
         {
            var allBindings = LevelModel.GetRectanglesBindings();
 
@@ -92,7 +94,7 @@ namespace Rectangle.Core
            }
         }
 
-        private void CreateBindingLine(Binding binding)
+        void CreateBindingLine(Binding binding)
         {
             var go = new GameObject();
             var line = go.AddComponent<LineRenderer>();

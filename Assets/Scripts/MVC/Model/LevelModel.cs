@@ -7,9 +7,6 @@ namespace Rectangle.Model
 {
     public class LevelModel
     {
-        public GameMode GameMode => _gameMode;
-        
-        private GameMode _gameMode;
         private List<IRectangle> _rectanglesOnMap = new List<IRectangle>();
         private IList<Binding> _rectanglesBindings = new List<Binding>();
         private Bounds _levelBounds = new Bounds(Vector3.zero, new Vector3(16f, 9f, 0));
@@ -30,11 +27,6 @@ namespace Rectangle.Model
             }
             
             return true;
-        }
-
-        public void SetGameState(GameMode newGameMode)
-        {
-            _gameMode = newGameMode;
         }
         
         public void AddModel(IRectangle model)
@@ -75,11 +67,5 @@ namespace Rectangle.Model
                 }
             }
         }
-    }
-
-    public enum GameMode
-    {
-        Default,
-        Binding
     }
 }
