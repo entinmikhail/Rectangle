@@ -450,6 +450,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _uiController: {fileID: 891931400}
+  _gameInfo: {fileID: 11400000, guid: 56bb49ec62020ea43972b5757f81c48a, type: 2}
 --- !u!4 &891931399
 Transform:
   m_ObjectHideFlags: 0

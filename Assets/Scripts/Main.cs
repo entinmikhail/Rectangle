@@ -16,7 +16,7 @@ public class Main : MonoBehaviour
     private InputHandler _input;
     
     
-    void Start()
+    private void Awake()
     {
         _levelModel = new LevelModel(_gameInfo.LevelBounds);
         _gameModel = new GameModel();
@@ -28,7 +28,7 @@ public class Main : MonoBehaviour
         _playerController.OnStart();
     }
     
-    void Update()
+    private void Update()
     {
         _playerController.OnUpdate();
         _levelManager.OnUpdate();

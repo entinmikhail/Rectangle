@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d96464c25d445099154098142c2b11d, type: 3}
   m_Name: GameInfo
   m_EditorClassIdentifier: 
-  _rectanglePrefab: {fileID: 0}
-  _timeDelayForDoubleClick: 0
-  _bindingLineMaterial: {fileID: 0}
-  _levelBounds: {x: 0, y: 0, z: 0}
+  _rectanglePrefab: {fileID: 4885010246349871759, guid: cba8211dd3c08e44a8ab24e23282424b, type: 3}
+  _timeDelayForDoubleClick: 0.3
+  _bindingLineMaterial: {fileID: 2100000, guid: 3f6326ef59fe3d149a37094b753788f5, type: 2}
+  _levelBounds: {x: 16, y: 9, z: 0}
