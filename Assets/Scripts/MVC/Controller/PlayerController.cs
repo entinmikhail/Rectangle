@@ -1,5 +1,4 @@
-﻿using Rectangle.Core;
-using Rectangle.InputManager;
+﻿using Rectangle.InputManager;
 using Rectangle.Model;
 using Rectangle.ScriptableObjects;
 using Rectangle.View;
@@ -10,7 +9,7 @@ namespace Rectangle.Controller
     public class PlayerController
     {
 
-        private LevelController _levelController;
+        private LevelManager _levelManager;
 
         private GameObject _rectangle;
         private GameObject _firstGo;
@@ -22,7 +21,6 @@ namespace Rectangle.Controller
         private GameObject _secondSelectedGo;
     
         private Vector3 _indent;
-    
         private bool _isFirstClick = true;
         private bool _isFirstClickBinding = true;
         private bool _isSelected;
@@ -30,10 +28,10 @@ namespace Rectangle.Controller
         private float _firstClickTime;
         private bool _isMouseLine;
 
-        public PlayerController( LevelController levelController, GameModel gameModel, InputHandler input, GameInfo gameInfo)
+        public PlayerController( LevelManager levelManager, GameModel gameModel, InputHandler input, GameInfo gameInfo)
         {
             _timeDelayForDoubleClick = gameInfo.TimeDelayForDoubleClick;
-            _levelController = levelController;
+            _levelManager = levelManager;
             _gameModel = gameModel;
             _input = input;
         }
@@ -42,7 +40,7 @@ namespace Rectangle.Controller
         {
             if (_isMouseLine)
             {
-                _levelController.MoveLineMouse(_input.GetMousePosition());
+                _levelManager.MoveLineMouse(_input.GetMousePosition());
             }
         }
         public void OnStart()
@@ -116,7 +114,7 @@ namespace Rectangle.Controller
                 if (_lastSelectedGo != null && _lastSelectedGo.CompareTag("UI")) return;
                 
                 mousePosition.z = 0;
-                _levelController.CreateRectangle(mousePosition);
+                _levelManager.CreateRectangle(mousePosition);
             }
         }
 
@@ -127,7 +125,7 @@ namespace Rectangle.Controller
                 var mousePosition = _input.GetMousePosition();
                 mousePosition.z = 0f;
                 
-                _levelController.MoveRectangle(_rectangle.GetComponent<LevelObjectView>(), 
+                _levelManager.MoveRectangle(_rectangle.GetComponent<LevelObjectView>(), 
                     mousePosition + _indent);   
             }
         }
@@ -146,7 +144,7 @@ namespace Rectangle.Controller
             if (IsRectangle())
             {
                 _isFirstClick = true;
-                _levelController.DestroyRectangle(_lastSelectedGo.GetComponent<LevelObjectView>());
+                _levelManager.DestroyRectangle(_lastSelectedGo.GetComponent<LevelObjectView>());
             }
         }
     
@@ -159,20 +157,20 @@ namespace Rectangle.Controller
                     _firstGo = _lastSelectedGo;
                     _isFirstClickBinding = false;
 
-                    _levelController.CreateLineToMousePosition(_firstGo.transform.position, _input.GetMousePosition());
+                    _levelManager.CreateLineToMousePosition(_firstGo.transform.position, _input.GetMousePosition());
                     _isMouseLine = true;
                 }
             }
             else
             {
                 _isFirstClickBinding = true;
-                _levelController.DestroyLineToMousePosition();
+                _levelManager.DestroyLineToMousePosition();
                 _isMouseLine = false;
             
                 if (IsRectangle())
                 {
                     var go = _lastSelectedGo;
-                    _levelController.CreateBinding(_firstGo.GetComponent<LevelObjectView>(),
+                    _levelManager.CreateBinding(_firstGo.GetComponent<LevelObjectView>(),
                         go.GetComponent<LevelObjectView>());
                 }
             }

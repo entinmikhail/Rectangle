@@ -26,6 +26,7 @@ namespace Rectangle.InputManager
             {
                 return hit.collider.gameObject;
             }
+            
             return null;
         }
 
@@ -33,15 +34,16 @@ namespace Rectangle.InputManager
         {
             var hit = Physics2D.Raycast(GetMousePosition(), Vector2.zero);
             var hitPoint = new Vector3(hit.point.x, hit.point.y, 0);
+            
             return hit.transform.position - hitPoint;
         }
     
         private void InputUpdate()
         {
             if (Input.GetButtonDown("Fire1")) ButtonDown?.Invoke();
-
+            
             if (Input.GetButton("Fire1")) ButtonDrag?.Invoke();
-
+            
             if (Input.GetButtonUp("Fire1")) ButtonUp?.Invoke();
         }
     }

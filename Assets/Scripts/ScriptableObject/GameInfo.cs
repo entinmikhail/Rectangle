@@ -15,6 +15,5 @@ namespace Rectangle.ScriptableObjects
         [SerializeField] private float _timeDelayForDoubleClick;
         [SerializeField] private Material _bindingLineMaterial;
         [SerializeField] private Vector3 _levelBounds;
-
     }
 }

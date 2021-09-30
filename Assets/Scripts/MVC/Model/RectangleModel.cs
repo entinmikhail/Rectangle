@@ -15,16 +15,24 @@ namespace Rectangle.Model
         public event Action<IRectangle> CreatedRectangle;
         public event Action<IRectangle> RemovedRectangle;
         public event Action<IRectangle, IRectangle> BindedRectangle;
+        public event Action<IRectangle> PositionChanged;
         
         public RectangleModel(Vector3 curPosition, GameInfo gameInfo)
         {
             PositionModel = new PositionModel(curPosition, gameInfo);
             CreatedRectangle?.Invoke(this);
+            PositionModel.PositionChanged +=  OnPositionChenged;
+        }
+
+        private void OnPositionChenged()
+        {
+            PositionChanged?.Invoke(this);
         }
 
         public void Destroy()
         {
             RemovedRectangle?.Invoke(this);
+            PositionModel.PositionChanged -= OnPositionChenged;
         }
 
         public void CreateBinding(IRectangle rectangleModel)

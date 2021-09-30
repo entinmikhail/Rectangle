@@ -2,87 +2,51 @@
 using Rectangle.Abstraction;
 using Rectangle.Model;
 using Rectangle.ScriptableObjects;
-using Rectangle.View;
 using UnityEngine;
-using Object = UnityEngine.Object;
-using Random = UnityEngine.Random;
 
-namespace Rectangle.Core
+namespace Rectangle.Controller
 {
-    public class LevelController : ILevelController
+     public class BindingManager
     {
         private LevelModel _levelModel;
-        private GameObject _rectanglePrefab;
         private Material _material;
         private LineRenderer _lineToMouse;
         private GameObject _lineGo;
-        private GameInfo _gameInfo;
-
-        private IDictionary<ILevelObjectView, IRectangle> _levelObjects = new Dictionary<ILevelObjectView, IRectangle>();
+        
         private IDictionary<Binding, LineRenderer> _bindingsGo = new Dictionary<Binding, LineRenderer>();
-   
-        public LevelController(LevelModel levelModel, GameInfo gameInfo)
+        private IDictionary<>
+        
+        public BindingManager(LevelModel levelModel, GameInfo gameInfo)
         {
             _levelModel = levelModel;
-            _gameInfo = gameInfo;
-            _rectanglePrefab = gameInfo.RectanglePrefab;
             _material = gameInfo.BindingLineMaterial;
             
-            _levelModel.BindingCreated += CreateBindingLine;
-            _levelModel.BindingRemoved += DestroyBindingLine;
-        }
-        
-        public void OnUpdate()
-        {
-            MoveAllBindingLine();
+            Attach();
         }
 
-        public void CreateRectangle(Vector3 position)
+        public void MoveBinding(IRectangle model)
         {
-            var model = new RectangleModel(position, _gameInfo);
-            if (_levelModel.IsCollision(model))
+             IDictionary<Binding, LineRenderer> tmp = new Dictionary<Binding, LineRenderer>();
+
+            foreach (var bLineRenderer in _bindingsGo)
             {
-                _levelModel.AddModel(model);
-                var go = Object.Instantiate(_rectanglePrefab, 
-                    model.PositionModel.CurPosition, Quaternion.identity);
-                
-                if (go.TryGetComponent(out SpriteRenderer result))
+                if (bLineRenderer.Key.FirstModel == model || bLineRenderer.Key.SecondModel == model)
                 {
-                    result.color = new Color(Random.value, Random.value, Random.value, 1f);
+                    tmp.Add(bLineRenderer);
                 }
-                
-                _levelObjects.Add(go.GetComponent<LevelObjectView>(), model);
             }
-        }
 
-        public void MoveRectangle(ILevelObjectView view, Vector3 newPosition)
-        {
-            var model = _levelObjects[view];
-            var prevPosition = model.PositionModel.CurPosition;
-            model.PositionModel.SetPosition(newPosition);
-            
-            if (!_levelModel.IsCollision(model))
+            foreach (var binding in tmp)
             {
-                model.PositionModel.SetPosition(prevPosition);
-                return;
+                MoveBindingLine(binding.Key);
             }
-            
-            view.Transform.position = newPosition;
         }
 
-        public void DestroyRectangle(ILevelObjectView view)
+        public void CreateBinding(IRectangle firstModel, IRectangle secondModel)
         {
-            _levelModel.RemoveRectangleModel(_levelObjects[view]);
-            _levelObjects.Remove(view);
-            
-            Object.Destroy(view.Transform.gameObject);
-        }
+            if (firstModel == secondModel) return;
 
-        public void CreateBinding(ILevelObjectView firstView, ILevelObjectView secondView)
-        {
-            if (firstView == secondView) return;
-
-            var binding = new Binding(_levelObjects[firstView], _levelObjects[secondView]);
+            var binding = new Binding(firstModel, secondModel);
             _levelModel.CreateBindingModel(binding);
         }
 
@@ -97,7 +61,7 @@ namespace Rectangle.Core
             Object.Destroy(_lineToMouse.gameObject);
         }
 
-        private void MoveAllBindingLine()
+        public void MoveAllBindingLine()
         {
            var allBindings = _levelModel.GetRectanglesBindings();
 
@@ -156,6 +120,23 @@ namespace Rectangle.Core
             list.Add(binding.SecondModel.PositionModel.CurPosition);
             
             return list;
+        }
+        
+        private void Attach()
+        {
+            _levelModel.BindingCreated += CreateBindingLine;
+            _levelModel.BindingRemoved += DestroyBindingLine;
+        }
+        
+        private void Detach()
+        {
+            _levelModel.BindingCreated -= CreateBindingLine;
+            _levelModel.BindingRemoved -= DestroyBindingLine;
+        }
+        
+        public void Dispose()
+        {
+            Detach();
         }
     }
 }
