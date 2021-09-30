@@ -10,25 +10,25 @@ namespace Rectangle.Core
 {
     public class LevelController : ILevelController
     {
-        public LevelModel LevelModel;
+        private LevelModel _levelModel;
         
         private IDictionary<ILevelObjectView, IRectangle> _levelObjects = new Dictionary<ILevelObjectView, IRectangle>();
         private IDictionary<Binding, LineRenderer> _bindingsGo = new Dictionary<Binding, LineRenderer>();
         private GameObject _rectanglePrefab;
         private Material _material;
-        
-        public LevelController()
+        private LineRenderer _lineToMouse;
+        private GameObject _lineGo;
+        public LevelController(LevelModel levelModel)
         {
-            LevelModel = new LevelModel();
+            _levelModel = levelModel;
             _rectanglePrefab = Resources.Load<GameObject>("Rectangle");
             _material = Resources.Load<Material>("Default");
+            
+            _levelModel.BindingCreated += CreateBindingLine;
+            _levelModel.BindingRemoved += DestroyBindingLine;
         }
 
-        public void OnInit()
-        {
-            LevelModel.BindingCreated += CreateBindingLine;
-            LevelModel.BindingRemoved += DestroyBindingLine;
-        }
+
 
         public void OnUpdate()
         {
@@ -38,9 +38,9 @@ namespace Rectangle.Core
         public void CreateRectangle(Vector3 position)
         {
             var model = new RectangleModel(position);
-            if (LevelModel.IsCollision(model))
+            if (_levelModel.IsCollision(model))
             {
-                LevelModel.AddModel(model);
+                _levelModel.AddModel(model);
                 var go = Object.Instantiate(_rectanglePrefab, 
                     model.PositionModel.CurPosition, Quaternion.identity);
                 
@@ -59,7 +59,7 @@ namespace Rectangle.Core
             var prevPosition = model.PositionModel.CurPosition;
             model.PositionModel.SetPosition(newPosition);
             
-            if (!LevelModel.IsCollision(model))
+            if (!_levelModel.IsCollision(model))
             {
                 model.PositionModel.SetPosition(prevPosition);
                 return;
@@ -70,7 +70,7 @@ namespace Rectangle.Core
 
         public void DestroyRectangle(ILevelObjectView view)
         {
-            LevelModel.RemoveRectangleModel(_levelObjects[view]);
+            _levelModel.RemoveRectangleModel(_levelObjects[view]);
             _levelObjects.Remove(view);
             
             Object.Destroy(view.Transform.gameObject);
@@ -81,12 +81,23 @@ namespace Rectangle.Core
             if (firstView == secondView) return;
 
             var binding = new Binding(_levelObjects[firstView], _levelObjects[secondView]);
-            LevelModel.CreateBindingModel(binding);
+            _levelModel.CreateBindingModel(binding);
         }
-        
+
+        public void CreateLineToMousePosition(Vector3 position, Vector3 mousePosition)
+        {
+            _lineToMouse = CreateLineRenderer();
+            _lineToMouse.SetPositions(new []{position, mousePosition});
+        }
+
+        public void DestroyLineToMousePosition()
+        {
+            Object.Destroy(_lineToMouse.gameObject);
+        }
+
         private void MoveAllBindingLine()
         {
-           var allBindings = LevelModel.GetRectanglesBindings();
+           var allBindings = _levelModel.GetRectanglesBindings();
 
            foreach (var binding in allBindings)
            {
@@ -94,18 +105,35 @@ namespace Rectangle.Core
            }
         }
 
-        void CreateBindingLine(Binding binding)
+        public void MoveLineMouse(Vector3 mousePosition)
+        {
+            if (_lineToMouse != null)
+            {
+                mousePosition.z = 0f;
+                _lineToMouse.SetPosition(1, mousePosition);
+            }
+        }
+        
+        private void CreateBindingLine(Binding binding)
+        {
+            
+            var line = CreateLineRenderer();
+            line.material.color = _lineToMouse.material.color;
+            line.SetPositions(GetCurBindingPosition(binding).ToArray());
+            
+            _bindingsGo.Add(binding, line);
+        }
+        
+        private LineRenderer CreateLineRenderer()
         {
             var go = new GameObject();
             var line = go.AddComponent<LineRenderer>();
-            
+
             go.name = "BindingLine";
             line.startWidth = 0.2f;
             line.material = _material;
             line.material.color = new Color(Random.value, Random.value, Random.value, 1f);
-            line.SetPositions(GetCurBindingPosition(binding).ToArray());
-            
-            _bindingsGo.Add(binding, line);
+            return line;
         }
 
         private void MoveBindingLine(Binding binding)

@@ -4,7 +4,6 @@ namespace Rectangle.Abstraction
 {
     public interface ILevelController
     {
-        void OnInit();
         void OnUpdate();
         void CreateRectangle(Vector3 position);
         void MoveRectangle(ILevelObjectView go, Vector3 newPosition);
