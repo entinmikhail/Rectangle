@@ -1,9 +1,8 @@
 {
-    "name": "Model",
+    "name": "Input",
     "rootNamespace": "",
     "references": [
-        "GUID:080957d98a027b54d90d05aa7e94ea6e",
-        "GUID:6d171ec3ad04e9c48b4217305936f6c5"
+        "GUID:080957d98a027b54d90d05aa7e94ea6e"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

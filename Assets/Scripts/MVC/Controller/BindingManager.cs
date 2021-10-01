@@ -1,23 +1,23 @@
 ﻿using System.Collections.Generic;
 using Rectangle.Abstraction;
-using Rectangle.Model;
-using Rectangle.ScriptableObjects;
+using Rectangle.Utils;
 using UnityEngine;
 
 namespace Rectangle.Controller
 {
-     public class BindingManager
+     public class BindingManager : IBindingManager
     {
-        private LevelModel _levelModel;
-        private Material _material;
+        private readonly ILevelModel _levelModel;
+        
+        private readonly Material _material;
         private LineRenderer _lineToMouse;
         private GameObject _lineGo;
         
-        private IDictionary<Binding, LineRenderer> _bindingsGo = new Dictionary<Binding, LineRenderer>();
-        private IDictionary<IRectangle, IList<Binding> > _rectangleBindings = new Dictionary<IRectangle, IList<Binding>>();
+        private readonly IDictionary<IRectangleBinding, LineRenderer> _bindingsGo = new Dictionary<IRectangleBinding, LineRenderer>();
+        private readonly IDictionary<IRectangle, IList<IRectangleBinding> > _rectangleBindings = new Dictionary<IRectangle, IList<IRectangleBinding>>();
 
         
-        public BindingManager(LevelModel levelModel, GameInfo gameInfo)
+        public BindingManager(ILevelModel levelModel, IGameInfo gameInfo)
         {
             _levelModel = levelModel;
             _material = gameInfo.BindingLineMaterial;
@@ -45,6 +45,7 @@ namespace Rectangle.Controller
 
             _rectangleBindings[firstModel].Add(firstBinding);
             _rectangleBindings[secondModel].Add(firstBinding);
+            
             _levelModel.CreateBindingModel(firstBinding);
         }
 
@@ -68,7 +69,7 @@ namespace Rectangle.Controller
             }
         }
         
-        private void CreateBindingLine(Binding binding)
+        private void CreateBindingLine(IRectangleBinding binding)
         {
             var line = CreateLineRenderer();
             line.material.color = _lineToMouse.material.color;
@@ -89,20 +90,21 @@ namespace Rectangle.Controller
             return line;
         }
 
-        private void MoveBindingLine(Binding binding)
+        private void MoveBindingLine(IRectangleBinding binding)
         {
             _bindingsGo[binding].SetPositions(GetCurBindingPosition(binding).ToArray());
         }
 
-        private void DestroyBindingLine(Binding binding)
+        private void DestroyBindingLine(IRectangleBinding binding)
         {
             Object.Destroy(_bindingsGo[binding].gameObject);
             _bindingsGo.Remove(binding);
         }
 
-        private List<Vector3> GetCurBindingPosition(Binding binding)
+        private List<Vector3> GetCurBindingPosition(IRectangleBinding binding)
         {
             var list = new List<Vector3>();
+            
             list.Add(binding.FirstModel.PositionModel.CurPosition);
             list.Add(binding.SecondModel.PositionModel.CurPosition);
             
@@ -111,12 +113,12 @@ namespace Rectangle.Controller
 
         private void OnRectangleAdded(IRectangle model)
         {
-            _rectangleBindings.Add(model, new List<Binding>());
+            _rectangleBindings.Add(model, new List<IRectangleBinding>());
         }
         
         private void OnRectangleRemoved(IRectangle model)
         {
-            var tmp = new Dictionary<IRectangle, Binding>();
+            var tmp = new Dictionary<IRectangle, IRectangleBinding>();
             
             foreach (var binding in _rectangleBindings[model])
             {
@@ -125,6 +127,7 @@ namespace Rectangle.Controller
                 else
                     tmp.Add(binding.FirstModel, binding);
             }
+            
             _rectangleBindings.Remove(model);
             
             foreach (var rectangleModel in tmp)
@@ -135,16 +138,16 @@ namespace Rectangle.Controller
         
         private void Attach()
         {
-            _levelModel.RectanglRemoved += OnRectangleRemoved;
-            _levelModel.RectanglAdded += OnRectangleAdded;
+            _levelModel.RectangleRemoved += OnRectangleRemoved;
+            _levelModel.RectangleAdded += OnRectangleAdded;
             _levelModel.BindingCreated += CreateBindingLine;
             _levelModel.BindingRemoved += DestroyBindingLine;
         }
         
         private void Detach()
         {
-            _levelModel.RectanglRemoved -= OnRectangleRemoved;
-            _levelModel.RectanglAdded -= OnRectangleAdded;
+            _levelModel.RectangleRemoved -= OnRectangleRemoved;
+            _levelModel.RectangleAdded -= OnRectangleAdded;
             _levelModel.BindingCreated -= CreateBindingLine;
             _levelModel.BindingRemoved -= DestroyBindingLine;
         }

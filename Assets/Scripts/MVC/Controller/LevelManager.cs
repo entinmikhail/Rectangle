@@ -1,44 +1,37 @@
 ﻿using System.Collections.Generic;
 using Rectangle.Abstraction;
 using Rectangle.Model;
-using Rectangle.ScriptableObjects;
-using Rectangle.View;
 using UnityEngine;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
 namespace Rectangle.Controller
 {
-    public class LevelManager : ILevelController
+    public class LevelManager : ILevelManager
     {
-        private LevelModel _levelModel;
-        private BindingManager _bindingManager;
+        private readonly ILevelModel _levelModel;
+        private readonly IBindingManager _bindingManager;
+        private readonly GameObject _rectanglePrefab;
+        private readonly IGameInfo _gameInfo;
         
         private LineRenderer _lineToMouse;
-        private GameObject _rectanglePrefab;
         private GameObject _lineGo;
-        private GameInfo _gameInfo;
         
-        private IDictionary<ILevelObjectView, IRectangle> _levelObjects = new Dictionary<ILevelObjectView, IRectangle>();
+        private readonly IDictionary<ILevelObjectView, IRectangle> _levelObjects = new Dictionary<ILevelObjectView, IRectangle>();
 
-        public LevelManager(LevelModel levelModel, GameInfo gameInfo)
+        public LevelManager(ILevelModel levelModel, IGameInfo gameInfo)
         {
             _levelModel = levelModel;
             _gameInfo = gameInfo;
             _rectanglePrefab = gameInfo.RectanglePrefab;
             _bindingManager = new BindingManager(_levelModel, _gameInfo);
         }
-
-        public void OnUpdate()
-        {
-            
-        }
-
+        
         public void CreateRectangle(Vector3 position)
         {
             var model = new RectangleModel(position, _gameInfo);
             
-            if (_levelModel.IsCollision(model))
+            if (!_levelModel.IsCollision(model))
             {
                 _levelModel.AddRectangle(model);
                 
@@ -48,7 +41,7 @@ namespace Rectangle.Controller
                 if (go.TryGetComponent(out SpriteRenderer result))
                     result.color = new Color(Random.value, Random.value, Random.value, 1f);
 
-                _levelObjects.Add(go.GetComponent<LevelObjectView>(), model);
+                _levelObjects.Add(go.GetComponent<ILevelObjectView>(), model);
 
                 model.PositionChanged += _bindingManager.MoveBindings;
             }
@@ -60,7 +53,7 @@ namespace Rectangle.Controller
             var prevPosition = model.PositionModel.CurPosition;
             model.PositionModel.SetPosition(newPosition);
             
-            if (!_levelModel.IsCollision(model))
+            if (_levelModel.IsCollision(model))
             {
                 model.PositionModel.SetPosition(prevPosition);
                 return;
@@ -68,7 +61,7 @@ namespace Rectangle.Controller
             
             view.Transform.position = newPosition;
         }
-
+        
         public void DestroyRectangle(ILevelObjectView view)
         {
             _levelObjects[view].PositionChanged -= _bindingManager.MoveBindings;

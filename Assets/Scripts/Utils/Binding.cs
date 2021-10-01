@@ -1,19 +1,18 @@
 ﻿using Rectangle.Abstraction;
 
-namespace Rectangle.Model
+namespace Rectangle.Utils
 {
-    public struct Binding
+    public readonly struct Binding : IRectangleBinding
     {
-        public IRectangle FirstModel;
-        public IRectangle SecondModel;
-
+        public IRectangle FirstModel { get; }
+        public IRectangle SecondModel { get; }
+        
         public Binding(IRectangle firstModel, IRectangle secondModel)
         {
             FirstModel = firstModel;
             SecondModel = secondModel;
         }
-        
-        public Binding GetReversBinding()
+        public IRectangleBinding GetReversBinding()
         {
             return new Binding(SecondModel, FirstModel);
         }

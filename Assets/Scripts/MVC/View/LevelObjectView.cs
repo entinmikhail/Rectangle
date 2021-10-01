@@ -7,5 +7,6 @@ namespace Rectangle.View
     {
         [SerializeField] private Transform _transform;
         public Transform Transform => _transform;
+        public string Tag => tag;
     }
 }
