@@ -24,8 +24,8 @@ namespace Rectangle.Model
 
         public bool IsCollision(IRectangle model)
         {
-            if (!_levelBounds.Contains(model.PositionModel.CurPosition)) return false;
-
+            if (!_levelBounds.Contains(model.PositionModel.CurPosition)) return true;
+            
             foreach (var rectangle in _rectanglesOnMap)
             {
                 if (rectangle == model) continue;
